@@ -1,37 +1,24 @@
 #!/usr/bin/python3
+"""Starts a Flask web application"""
 from flask import Flask
-"""class Flask"""
-
-
 app = Flask(__name__)
 
 
 @app.route('/', strict_slashes=False)
 def hello_hbnb():
-    """displays text
-    Returns:
-        text
-    """
-    return "Hello HBNB!"
+    """Displays greeting"""
+    return 'Hello HBNB!'
 
 
 @app.route('/hbnb', strict_slashes=False)
-def display_hbnb():
-    """displays text
-    Returns:
-        text
-    """
-    return "HBNB"
+def hbnb():
+    """Displays greeting"""
+    return 'HBNB'
 
 
 @app.route('/c/<text>', strict_slashes=False)
-def display_text(text):
-    """displays text
-    Args:
-        text (str): text
-    Returns:
-        text
-    """
+def c_text(text):
+    """Displays 'C' followed by the value of the text variable"""
     return 'C %s' % text.replace('_', ' ')
 
 

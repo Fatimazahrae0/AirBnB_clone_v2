@@ -1,19 +1,25 @@
 #!/usr/bin/python3
-from fabric.api import *
-import os
-from datetime import datetime
+# generates a .tgz archive from the contents of the web_static
 
-env.hosts = ['localhost']
+from fabric.api import local
+from datetime import datetime
 
 
 def do_pack():
-    try:
-        filepath = "versions/web_static_" + datetime.now().\
-                   strftime("%Y%m%d%H%M%S") + ".tgz"
-        local("mkdir -p versions")
-        local("tar -zcvf versions/web_static_$(date +%Y%m%d%H%M%S).tgz\
-        web_static")
-        print("web_static packed: {} -> {}".
-              format(filepath, os.path.getsize(filepath)))
-    except:
-            return None
+    """Generates a .tgz archive from the contents of the web_static folder"""
+
+    # Create the versions directory if it doesn't exist
+    local("mkdir -p versions")
+
+    # Create a timestamped filename
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    filename = "versions/web_static_{}.tgz".format(timestamp)
+
+    # Create a tar gzipped archive of the web_static directory
+    result = local("tar -cvzf {} web_static".format(filename))
+
+    # Return the name of the archive file on success, otherwise return None
+    if result.succeeded:
+        return filename
+    else:
+        return None

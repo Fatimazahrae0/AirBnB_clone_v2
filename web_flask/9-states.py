@@ -1,49 +1,35 @@
 #!/usr/bin/python3
+"""Starts a Flask web application"""
 from flask import Flask, render_template
 from models import storage
-from models.state import State
-from models.city import City
-
 
 app = Flask(__name__)
+app.url_map.strict_slashes = False
+
+
+@app.route('/states')
+def states():
+    """List states"""
+    states = storage.all("State").values()
+    states = sorted(states, key=lambda state: state.name)
+    return render_template('9-states.html', states=states)
+
+
+@app.route('/states/<id>')
+def states_id(id):
+    """Get state by id"""
+    states = storage.all("State").values()
+    for state in states:
+        if state.id == id:
+            state.cities = sorted(state.cities, key=lambda city: city.name)
+            return render_template('9-states.html', state=state)
+    return render_template('9-states.html')
 
 
 @app.teardown_appcontext
-def tear_down(self):
-    """tear down app context"""
+def teardown_db(exception):
+    """Close"""
     storage.close()
-
-
-@app.route('/states', strict_slashes=False)
-def list_all_states():
-    """lists states from database
-    Returns:
-        HTML
-    """
-    dict_states = storage.all(State)
-    all_states = []
-    for k, v in dict_states.items():
-        all_states.append(v)
-    return render_template('9-states.html', all_states=all_states)
-
-
-@app.route('/states/<id>', strict_slashes=False)
-def find_state(id):
-    """lists states from database with specific id
-    Args:
-        id (str): id
-    Returns:
-        HTML
-    """
-    dict_states = storage.all(State)
-    all_states = []
-    all_states_id = []
-    for k, v in dict_states.items():
-        all_states_id.append(v.id)
-        all_states.append(v)
-    return render_template('9-states.html', all_states=all_states,
-                           all_states_id=all_states_id, id=id)
-
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
